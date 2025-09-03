@@ -33,6 +33,20 @@ O código foi modularizado nas seguintes funções para melhorar a organização
 -   `sacar(contas, usuarios)`: Gerencia a lógica para retirar um valor do saldo da conta.
 -   `exibir_extrato(contas, usuarios)`: Mostra o histórico de transações da conta.
 
+## 💡 Melhorias Futuras
+
+Este projeto é um ponto de partida. Abaixo estão algumas ideias e melhorias que podem ser implementadas no futuro para torná-lo mais robusto e completo:
+
+- [ ] **Programação Orientada a Objetos (POO):** Refatorar o código para utilizar classes (ex: `Cliente`, `Conta`, `Transacao`) para melhor organizar a estrutura e o comportamento do sistema.
+- [ ] **Persistência de Dados:** Implementar uma forma de salvar e carregar os dados dos usuários e contas, para que não sejam perdidos ao fechar o programa (usando arquivos JSON ou um banco de dados).
+- [ ] **Regras de Negócio para Saque:** Implementar as regras de negócio que faltam na função `sacar`, como o **limite de 3 saques por sessão** e um valor máximo por transação.
+- [ ] **Validação de Valores de Transação:** Impedir depósitos e saques de valores **negativos ou nulos**, garantindo a integridade dos dados.
+- [ ] **Tratamento de Erros de Entrada:** Adicionar blocos `try-except` para lidar com **entradas não numéricas** em campos de valor, CPF e número da conta, evitando que o programa encerre inesperadamente.
+- [ ] **Validação de Formato de Dados:** Implementar checagens para garantir que dados como **CPF** (11 dígitos) e **data de nascimento** sejam inseridos em formatos válidos.
+- [ ] **Função de Histórico:** Criar uma classe ou estrutura de dados dedicada para registrar e exibir o histórico de transações de forma mais organizada.
+- [ ] **Interface Gráfica (GUI):** Desenvolver uma interface gráfica para uma experiência de usuário mais amigável.
+
+ 
 ## ⚙️ Como Executar o Projeto
 
 1.  **Clone o repositório:**
