@@ -1,5 +1,3 @@
-import sys
-
 
 def conferir_cadastro(usuarios):
     cpf = input("Informe o CPF do usuário (somentos números):\n ")
