@@ -42,12 +42,12 @@ Com a base sólida da POO, o projeto está pronto para novas evoluções:
 
 1.  **Clone o repositório:**
     ```bash
-    git clone [https://github.com/IagoQuintana/Criando-um-Sistema-Banc-rio-com-Python.git](https://github.com/IagoQuintana/Criando-um-Sistema-Banc-rio-com-Python.git)
+    git clone https://github.com/IagoQuintana/sistema-bancario-python
     ```
 
 2.  **Navegue até o diretório do projeto:**
     ```bash
-    cd Criando-um-Sistema-Banc-rio-com-Python
+    cd sistema-bancario-python
     ```
 
 3.  **Execute o script Python:**
