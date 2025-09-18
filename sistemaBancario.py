@@ -1,10 +1,7 @@
 from abc import ABC, abstractmethod, abstractproperty
 from datetime import datetime
 
-# ===================================================================
-# SUAS CLASSES ORIGINAIS
-# ===================================================================
-
+# Definição das classes
 
 class Cliente:
     def __init__(self, endereco):
@@ -173,6 +170,9 @@ class Deposito(Transacao):
 
         if sucesso_transacao:
             conta.historico.adicionar_transacao(self)
+
+
+# Implementação do "sistema" menu e operações
 
 
 def exibir_menu():
