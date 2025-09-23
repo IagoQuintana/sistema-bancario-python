@@ -3,6 +3,7 @@ from datetime import datetime
 
 # Definição das classes
 
+
 class Cliente:
     def __init__(self, endereco):
         self.endereco = endereco
@@ -130,6 +131,11 @@ class Historico:
             }
         )
 
+    def gerar_relatorio(self, tipo_transacao):
+        for transacao in self._transacoes:
+            if tipo_transacao is None or transacao["tipo"].lower() == tipo_transacao.lower():
+                yield transacao
+
 
 class Transacao(ABC):
     @property
@@ -172,6 +178,28 @@ class Deposito(Transacao):
             conta.historico.adicionar_transacao(self)
 
 
+class ContasIterador:
+    def __init__(self, contas):
+        self.contas = contas
+        self._indice = 0
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        try:
+            conta = self.contas[self._indice]
+            return f"""
+            Agência:\t{conta.agencia}
+            Número:\t\t{conta.numero}
+            Titular:\t{conta.cliente.nome}
+            Saldo:\t\tR$ {conta.saldo:.2f}"""
+        except IndexError:
+            raise StopIteration
+
+        finally:
+            self._indice += 1
+
 # Implementação do "sistema" menu e operações
 
 
@@ -189,6 +217,15 @@ def exibir_menu():
     return input(menu)
 
 
+def log_trasacao(funcao):
+    def wrapper(*args, **kwargs):
+        print(datetime.now().strftime("%d-%m-%Y %H:%M:%S"))
+        print(funcao.__name__.upper())
+        result = funcao(*args, **kwargs)
+        return result
+    return wrapper
+
+
 def filtrar_cliente(cpf, clientes):
     clientes_filtrados = [
         cliente for cliente in clientes if cliente.cpf == cpf]
@@ -202,6 +239,7 @@ def recuperar_conta_cliente(cliente):
     return cliente.contas[0]
 
 
+@log_trasacao
 def depositar(clientes):
     cpf = input("Informe o CPF do cliente: ")
     cliente = filtrar_cliente(cpf, clientes)
@@ -218,6 +256,7 @@ def depositar(clientes):
         cliente.realizar_transacao(conta, transacao)
 
 
+@log_trasacao
 def sacar(clientes):
     cpf = input("Informe o CPF do cliente: ")
     cliente = filtrar_cliente(cpf, clientes)
@@ -234,6 +273,7 @@ def sacar(clientes):
         cliente.realizar_transacao(conta, transacao)
 
 
+@log_trasacao
 def exibir_extrato(clientes):
     cpf = input("Informe o CPF do cliente: ")
     cliente = filtrar_cliente(cpf, clientes)
@@ -243,20 +283,31 @@ def exibir_extrato(clientes):
         return
 
     conta = recuperar_conta_cliente(cliente)
+    tipo = input(
+        "Informe o tipo de transão que deseja visualizar:\n Saques - s\n Depósitos - d\n Todas - t\n")
+    if tipo == 't':
+        tipo_transacao = None
+    elif tipo == 's':
+        tipo_transacao = 'saque'
+    elif tipo == 'd':
+        tipo_transacao = 'deposito'
     if conta:
         print("\n================ EXTRATO ================")
-        transacoes = conta.historico.transacoes
+        extrato = ''
+        tem_transacao = False
 
-        if not transacoes:
-            print("Não foram realizadas movimentações.")
-        else:
-            for transacao in transacoes:
-                print(f"{transacao['tipo']}:\n\tR$ {transacao['valor']:.2f}")
+        for transacao in conta.historico.gerar_relatorio(tipo_transacao):
+            tem_transacao = True
+            extrato += f"\n{transacao['tipo']}:\n\tR$ {transacao['valor']:.2f}"
+        if not tem_transacao:
+            extrato = "Não foram realizadas movimentações"
 
-        print(f"\nSaldo:\n\tR$ {conta.saldo:.2f}")
-        print("==========================================")
+    print(extrato)
+    print(f"\nSaldo:\n\tR$ {conta.saldo:.2f}")
+    print("==========================================")
 
 
+@log_trasacao
 def criar_cliente(clientes):
     cpf = input("Informe o CPF (somente número): ")
     cliente = filtrar_cliente(cpf, clientes)
@@ -277,6 +328,7 @@ def criar_cliente(clientes):
     print("\n=== Cliente criado com sucesso! ===")
 
 
+@log_trasacao
 def criar_conta(numero_conta, clientes, contas):
     cpf = input("Informe o CPF do cliente: ")
     cliente = filtrar_cliente(cpf, clientes)
@@ -298,8 +350,7 @@ def listar_contas(contas):
         return
 
     print("\n================ LISTA DE CONTAS ================")
-    for conta in contas:
-
+    for conta in ContasIterador(contas):
         print(conta)
         print("-" * 30)
 
