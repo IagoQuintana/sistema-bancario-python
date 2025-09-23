@@ -1,34 +1,44 @@
 # Desafio DIO: Modelando o Sistema Bancário com Programação Orientada a Objetos em Python
 
-Este repositório contém a resolução do desafio de projeto "Modelando o Sistema Bancário com POO em Python", uma evolução do desafio anterior proposto pela Digital Innovation One (DIO)
+Este repositório contém uma versão avançada do desafio de projeto "Modelando o Sistema Bancário com POO", proposto pela Digital Innovation One (DIO). 
+O projeto original foi aprimorado com a aplicação de conceitos como **Decorators**, **Iterators** e **Generators**, além de regras de negócio mais complexas.
+O objetivo foi transformar um sistema bancário funcional em uma aplicação mais robusta, eficiente e aderente às boas práticas de desenvolvimento Python, aprofundando a estrutura orientada a objetos.
 
-O objetivo principal foi refatorar o sistema bancário, que antes era estruturado com funções, para uma arquitetura baseada em **Programação Orientada a Objetos (POO)**. Essa nova abordagem visa representar as entidades do mundo real (como Clientes e Contas) de forma mais clara e coesa, melhorando a organização, o encapsulamento e a manutenibilidade do código.
 
 ## 🚀 Funcionalidades
 
-O sistema continua a oferecer as operações essenciais de um sistema bancário:
+O sistema agora conta com funcionalidades mais sofisticadas:
 
--   **Cadastrar novos usuários (Clientes):** Adiciona novos clientes ao sistema, validando se o CPF já existe.
--   **Criar novas contas correntes:** Vincula uma nova conta a um cliente existente.
--   **Listar contas cadastradas:** Exibe detalhes de todas as contas abertas.
--   **Realizar depósitos:** Adiciona valores ao saldo de uma conta, registrando a transação.
--   **Realizar saques:** Retira valores do saldo, aplicando regras de negócio como limite de saques e valor máximo por transação.
--   **Exibir extrato:** Mostra o histórico detalhado de transações (depósitos e saques) de uma conta.
--   **Sair:** Encerra a execução do programa.
+-   **Cadastro de Clientes e Contas:** A base do sistema, permitindo a criação de clientes (Pessoa Física) e a vinculação de contas correntes.
+-   **Operações de Saque e Depósito:** Transações financeiras com validações de saldo, valor e limites.
+-   **Extrato Detalhado e Filtrável:** Permite visualizar o histórico de transações com a opção de filtrar por **depósitos**, **saques** ou ver **todas as movimentações**. Cada transação agora inclui data e hora.
+-   **Limite de Transações Diárias:** O sistema implementa uma regra de negócio que limita o número de transações (saques e depósitos) a **10 por dia** para cada conta.
+-   **Listagem de Contas Otimizada:** Utiliza um iterador customizado para percorrer e exibir as contas cadastradas de forma eficiente.
+-   **Log de Transações no Console:** Todas as operações principais (saque, depósito, extrato) são registradas no console com data e hora, através de um decorator.
 
+  
 ## 🛠️ Tecnologias Utilizadas
 
--   **Python 3:** O projeto foi desenvolvido inteiramente em Python, utilizando os princípios de POO.
+Para construir esta versão, foram utilizados diversos recursos da linguagem Python:
+
+-   **Python 3**
+-   **Programação Orientada a Objetos (POO):** Uso de classes, herança, polimorfismo e encapsulamento para modelar o sistema.
+-   **Classes Abstratas (ABC):** Para definir "contratos" e garantir que classes como `Transacao` sejam implementadas corretamente.
+-   **Decorators:** O decorator `@log_transacao` foi criado para adicionar a funcionalidade de logging de forma limpa e desacoplada do código principal das funções.
+-   **Iterators:** A classe `ContasIterador` implementa o protocolo de iteração para percorrer a lista de contas de maneira "pythônica".
+-   **Generators:** O método `gerar_relatorio` na classe `Historico` utiliza `yield` para criar um gerador, otimizando o consumo de memória ao filtrar transações.
+-   **Módulo `datetime`:** Para registrar o timestamp preciso de cada transação.
+
 
 ## 🏛️ Arquitetura Orientada a Objetos
 
-O código foi reestruturado em classes para representar os diferentes componentes do sistema bancário, melhorando a coesão e o encapsulamento das responsabilidades:
+O código foi organizado nas seguintes classes principais:
 
--   **`Cliente`**: Classe que representa o cliente do banco. Armazena dados pessoais como nome, data de nascimento e CPF, além de um histórico de contas associadas.
--   **`Conta`**: Classe base que abstrai os atributos e métodos comuns a todas as contas, como saldo, agência, número e o histórico de transações.
--   **`ContaCorrente`**: Herda da classe `Conta` e implementa as regras de negócio específicas para contas correntes, como o limite de saques diários e o valor máximo por saque.
--   **`Historico`**: Classe responsável por registrar e gerenciar todas as transações (depósitos e saques) realizadas em uma conta.
--   **`Transacao`** (e suas subclasses `Deposito` e `Saque`): Classes que modelam as operações financeiras, permitindo que cada transação seja registrada como um objeto individual no histórico da conta.
+-   **`Cliente`** e **`PessoaFisica`**: Modelam o cliente e seus dados, além de gerenciar a relação com suas contas e aplicar regras de transação.
+-   **`Conta`** e **`ContaCorrente`**: Representam as contas bancárias, controlando saldo, limites e o histórico de operações.
+-   **`Historico`**: Gerencia a lista de transações de uma conta, permitindo a adição de novas transações, o controle do limite diário e a geração de relatórios filtrados.
+-   **`Transacao`**, **`Saque`** e **`Deposito`**: Classes que representam as operações financeiras, registrando seu valor e tipo.
+
 
 ## 💡 Melhorias Futuras
 
@@ -37,6 +47,8 @@ Com a base sólida da POO, o projeto está pronto para novas evoluções:
 - [ ] **Persistência de Dados:** Implementar uma forma de salvar e carregar os dados (usando arquivos JSON, Pickle ou um banco de dados) para que as informações não se percam ao fechar o programa.
 - [ ] **Tratamento de Erros:** Aprimorar o tratamento de erros para entradas inválidas do usuário (ex: letras em campos numéricos), utilizando blocos `try-except` para uma experiência mais robusta.
 - [ ] **Validação de Formato de Dados:** Implementar checagens mais rigorosas para garantir que dados como **CPF** (11 dígitos) e **data de nascimento** sejam inseridos em formatos válidos.
+- [ ] **Interface Gráfica (GUI):** Desenvolver uma interface gráfica simples para o sistema.
+
 
 ## ⚙️ Como Executar o Projeto
 
