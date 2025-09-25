@@ -1,5 +1,9 @@
 from abc import ABC, abstractmethod, abstractproperty
 from datetime import datetime
+import csv
+from pathlib import Path
+
+ROOT_PATH = Path(__file__).parent
 
 # Definição das classes
 
@@ -27,6 +31,9 @@ class PessoaFisica(Cliente):
         self.data_nascimento = data_nascimento
         self.cpf = cpf
 
+    def __repr__(self):
+        return f"<{self.__class__.__name__}: {self.cpf}>"
+
 
 class Conta:
     def __init__(self, numero, cliente):
@@ -35,6 +42,10 @@ class Conta:
         self._agencia = "0001"
         self._cliente = cliente
         self._historico = Historico()
+
+    def _definir_saldo_inicial(self, valor):
+        self._saldo = valor
+        return self._saldo
 
     @property
     def saldo(self):
@@ -110,6 +121,9 @@ class ContaCorrente(Conta):
             C/C:\t\t{self.numero}
             Titular:\t{self.cliente.nome}
         """
+
+    def __repr__(self):
+        return f"<{self.__class__.__name__}: ({self.agencia}, {self.numero}, {self.cliente.nome})>"
 
 
 class Historico:
@@ -216,22 +230,27 @@ class ContasIterador:
 def exibir_menu():
     menu = """
     ================ MENU ================
-    [d]\tDepositar
-    [s]\tSacar
-    [e]\tExtrato
+    [d]\t\tDepositar
+    [s]\t\tSacar
+    [e]\t\tExtrato
     [nc]\tNova conta
     [lc]\tListar contas
     [nu]\tNovo usuário
-    [q]\tSair
+    [q]\t\tSair
     => """
     return input(menu)
 
 
 def log_trasacao(funcao):
     def wrapper(*args, **kwargs):
+
         print(datetime.now().strftime("%d-%m-%Y %H:%M:%S"))
         print(funcao.__name__.upper())
         result = funcao(*args, **kwargs)
+        with open(ROOT_PATH/"log.txt", "a", encoding="utf-8", newline="") as log:
+            log.write(
+                f"{datetime.now().strftime("%d-%m-%Y %H:%M:%S")} Função: '{funcao.__name__}' executada com argumentos {args} e {kwargs}. Retornou {result}\n")
+
         return result
     return wrapper
 
@@ -365,9 +384,82 @@ def listar_contas(contas):
         print("-" * 30)
 
 
+def salvar_clientes(clientes):
+    try:
+        with open(ROOT_PATH/"clientes.csv", "w", newline="", encoding="utf-8") as file:
+            writer = csv.writer(file)
+            writer.writerow(["cpf", "nome", "data_nascimento", "endereco"])
+            for cliente in clientes:
+                writer.writerow([cliente.cpf, cliente.nome,
+                                cliente.data_nascimento, cliente.endereco])
+    except IOError as exc:
+        print(f"Erro: {exc}")
+
+
+def salvar_contas(contas):
+    try:
+        with open(ROOT_PATH/"contas.csv", "w", newline="", encoding="utf-8") as file:
+            writer = csv.writer(file)
+            writer.writerow(
+                ["numero", "agencia", "saldo", "limite", "cpf_cliente"])
+            for conta in contas:
+                writer.writerow([conta.numero, conta.agencia,
+                                conta.saldo, conta.limite, conta.cliente.cpf])
+
+    except IOError as exc:
+        print(f"Erro: {exc}")
+
+
+def carregar_clientes():
+    clientes_carregados = []
+    try:
+        with open(ROOT_PATH/"clientes.csv", "r", encoding="utf-8") as file:
+            reader = csv.DictReader(file)
+
+            for row in reader:
+                nome = row["nome"]
+                cpf = row["cpf"]
+                data_nascimento = row["data_nascimento"]
+                endereco = row["endereco"]
+                novo_cliente = PessoaFisica(
+                    nome=nome, data_nascimento=data_nascimento, cpf=cpf, endereco=endereco)
+                clientes_carregados.append(novo_cliente)
+
+    except IOError as exc:
+        print(f"Erro: {exc}")
+    return clientes_carregados
+
+
+def carregar_contas(clientes):
+    contas_carregadas = []
+    try:
+        with open(ROOT_PATH/"contas.csv", "r", encoding="utf-8") as file:
+            reader = csv.DictReader(file)
+
+            for row in reader:
+                numero = row["numero"]
+                saldo = float(row["saldo"])
+                cpf = row["cpf_cliente"]
+                cliente = filtrar_cliente(cpf, clientes)
+                conta = ContaCorrente.nova_conta(
+                    cliente=cliente, numero=numero)
+                conta._definir_saldo_inicial(saldo)
+                contas_carregadas.append(conta)
+                cliente.adicionar_conta(conta)
+
+    except IOError as exc:
+        print(f"Erro: {exc}")
+
+    return contas_carregadas
+
+
 def main():
-    clientes = []
-    contas = []
+    clientes = carregar_clientes()
+    contas = carregar_contas(clientes)
+
+    numero_proxima_conta = 1
+    if contas:
+        numero_proxima_conta = max(int(c.numero) for c in contas) + 1
 
     while True:
         opcao = exibir_menu()
@@ -381,12 +473,14 @@ def main():
         elif opcao == "nu":
             criar_cliente(clientes)
         elif opcao == "nc":
-            numero_conta = len(contas) + 1
-            criar_conta(numero_conta, clientes, contas)
+            criar_conta(numero_proxima_conta, clientes, contas)
+            numero_proxima_conta += 1
         elif opcao == "lc":
             listar_contas(contas)
         elif opcao == "q":
             print("\nObrigado por usar nosso sistema! Saindo...")
+            salvar_clientes(clientes)
+            salvar_contas(contas)
             break
         else:
             print(

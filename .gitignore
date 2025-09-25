@@ -1,0 +1,32 @@
+# Python specific ignores
+*.pyc
+__pycache__/
+.pytest_cache/
+.mypy_cache/
+.ipynb_checkpoints/ # Jupyter notebooks checkpoints
+
+# Virtual environment
+.venv/
+env/
+venv/
+
+# Operating System Files
+.DS_Store
+Thumbs.db
+
+# --- Seus Ignores Específicos para este Projeto ---
+
+# 1. Arquivo de saída transformado
+# Se o seu arquivo de saída é gerado pelo script, geralmente não queremos ele no Git.
+# Opcional: Se você quiser que o arquivo transformado esteja no Git para exibição, REMOVA esta linha.
+clientes.csv
+contas.csv
+log.txt
+
+# 2. Chaves de API ou Variáveis de Ambiente Sensíveis
+# Se você usar um arquivo .env para guardar sua chave GOOGLE_API_KEY, adicione-o aqui.
+# Isso é super importante para segurança.
+.env
+
+# 3. Outros arquivos que você não quer versionar
+
